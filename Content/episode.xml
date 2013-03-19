@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <!-- TODO: replace this Asset with your own XML asset data. -->
+  <Asset Type="ContentManifestExtensions.Episode">
+    <Type>Asset</Type>
+    <Name>Demo.Content</Name>
+    <Version>1</Version>
+    <Dependencies>
+    </Dependencies>
+  </Asset>
+</XnaContent>
