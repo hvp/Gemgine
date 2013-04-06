@@ -3,6 +3,7 @@
 [Oo]bj/
 # Sub-repos
 .git/
+Adjuster/
 
 # mstest test results
 TestResults

@@ -308,20 +308,20 @@ namespace MISP
 
         public static ScriptObject ParseRoot(String script, String filename)
         {
-            var commentFree = "";
+            var commentFree = new StringBuilder();
             var state = new ParseState { start = 0, end = script.Length, source = script, filename = filename };
             while (!state.AtEnd())
             {
                 if (state.MatchNext("/*"))
-                    commentFree += (new String(' ',ParseComment(state)));
+                    commentFree.Append(new String(' ',ParseComment(state)));
                 else
                 {
-                    commentFree += state.Next();
+                    commentFree.Append(state.Next());
                     state.Advance();
                 }
             }
 
-            return ParseStringExpression(new ParseState { start = 0, end = commentFree.Length, source = commentFree, filename = filename }, true);
+            return ParseStringExpression(new ParseState { start = 0, end = commentFree.Length, source = commentFree.ToString(), filename = filename }, true);
         }
                 
     }

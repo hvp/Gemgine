@@ -20,9 +20,8 @@ namespace Gem.Network
         
         public ClientModule(System.Net.IPAddress host, int port, ClientGame parentGame)
         {
-            try
-            {
-                netSession = new Network.ClientSession(0, new System.Net.IPEndPoint(host, port), Console.WriteLine);
+                netSession = new Network.ClientSession(0, new System.Net.IPEndPoint(host, port), 
+                    parentGame.Main.ScriptConsole.Write);
 
                 netSession.onDatagramReceived += (data) =>
                 {
@@ -77,13 +76,8 @@ namespace Gem.Network
                     }
                 };
 
-                Console.WriteLine("Connected to server " + host + " on port " + port);
-            }
-            catch (Exception e)
-            {
-                System.Console.WriteLine("When trying to create a client game, " + e.Message);
-                throw e;
-            }
+                parentGame.Main.Write("Connected to server " + host + " on port " + port + "\n");
+            
         }
 
         void IModule.BeginSimulation(Simulation sim)

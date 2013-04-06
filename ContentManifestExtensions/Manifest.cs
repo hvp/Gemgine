@@ -9,12 +9,8 @@ namespace ContentManifestExtensions
     {
         Unknown,
         Texture,
-        Map,
         XML,
-        Conversation,
-        ParticleEffect,
-        Model,
-        Animation,
+        MISPScript
     }
 
     public class Entry

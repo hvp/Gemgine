@@ -71,7 +71,7 @@ PixelShaderOutput PSColor(VertexShaderOutput input) : COLOR0
 		(DiffuseColor * DiffuseIntensity * lightIntensity * texColor)
 		+ (FillColor * FillIntensity * dot(normal, FillLightDirection) * texColor));
 	output.Color += texColor * 0.1;
-    output.Color = lerp(output.Color, FogColor, 1.0f - input.FogFactor);
+    //output.Color = lerp(output.Color, FogColor, 1.0f - input.FogFactor);
 	output.Color.a = input.Color.a;
     return output;
 }

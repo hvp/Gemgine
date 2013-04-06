@@ -116,9 +116,20 @@ namespace MISP
             return r;
         }
 
-        public static ScriptObject GenerateLazyBindingObjectForStaticLibrary(System.Type type)
+        public static ScriptObject GenerateLazyBindingObjectForStaticLibrary(System.Type type, bool generateConstructor = false)
         {
             var r = new GenericScriptObject();
+            if (generateConstructor)
+            {
+                r.SetProperty("@construct", Function.MakeSystemFunction("@construct",
+               Arguments.Args(Arguments.Optional(Arguments.Repeat("argument"))),
+               "Create a new instance of " + type.Name,
+               (context, arguments) =>
+               {
+                   return Activator.CreateInstance(type, (arguments[0] as ScriptList).ToArray());
+               }));
+            }
+
             foreach (var method in type.GetMethods())
                 if (method.IsPublic && method.IsStatic)
                     r.SetProperty(TransformMethodName(method.Name), LazyBindStaticMethod(type, method.Name));

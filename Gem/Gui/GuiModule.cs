@@ -19,6 +19,7 @@ namespace Gem
         internal Gui.UIItem uiRoot = null;
         private Input Input = null;
         private MISP.ScriptObject defaultRootSettings = null;
+        private Simulation sim;
 
         public GuiModule(GraphicsDevice device, Input input)
         {
@@ -46,16 +47,22 @@ namespace Gem
 
         public void ClearUI() { uiRoot.children.Clear(); }
 
+        public void ButtonEvent(Object handler, UIItem button)
+        {
+            sim.EnqueueEvent("@raw-input-event", new MISP.ScriptList(handler, button));
+        }
+
         public void HandleInput(Input input)
         {
-            uiRoot.Update(input);
+            uiRoot.Update(input, this);
         }
 
 #region IModule members
         void IModule.BeginSimulation(Simulation sim)
         {
-            uiRoot.defaults.SetProperty("font", new BitmapFont(sim.Content.Load<Texture2D>("font"), 16, 16, 10));
+            uiRoot.defaults.SetProperty("font", new BitmapFont(sim.Content.Load<Texture2D>("small-font"), 16, 16, 10));
             uiRoot.defaults.SetProperty("text-color", new Vector3(0, 0, 0));
+            this.sim = sim;
         }
 
         void IModule.EndSimulation()
@@ -76,7 +83,9 @@ namespace Gem
 
         void IModule.BindScript(MISP.Engine scriptEngine)
         {
-            scriptEngine.AddGlobalVariable("ui", (context) => { return uiRoot; });
+            scriptEngine.AddGlobalVariable("ui-root", c => uiRoot);
+            var guiBinding = Gem.Gui.MispBinding.GenerateBinding();
+            scriptEngine.AddGlobalVariable("ui", c => guiBinding);
         }
 #endregion
 

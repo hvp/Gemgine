@@ -17,7 +17,7 @@ namespace XNAConsole
         GraphicsDeviceManager graphics;
         TextDisplay display;
         MISP.Console console;
-        DynamicConsole dynamicConsole;
+        DynamicConsoleBuffer dynamicConsole;
         List<String> commandRecallBuffer = new List<String>();
         int recallBufferPlace = 0;
         internal BufferedList<MISP.ScriptObject> events = new BufferedList<MISP.ScriptObject>();
@@ -56,18 +56,18 @@ namespace XNAConsole
         {
             display = new TextDisplay(80, 25, /*128, 33,*/ GraphicsDevice, Content);
             display.viewport = new Viewport(0, 0, 800, 600);
-            dynamicConsole = new DynamicConsole(2048, display);
+            dynamicConsole = new DynamicConsoleBuffer(2048, display);
 
             input = new MouseInput();
             inputModule = new InputModule(this);
             renderer = new RenderModule(GraphicsDevice, Content);
 
-            scene = new Scene(new BoundingBox(new Vector3(-100, -100, -100), new Vector3(100, 100, 100)), 5.0f);
-            scene.AddModel(new ModelComponent(GeometryGeneration.CompiledModel.CompileModel(
-                new RawModel(Gen.FacetCopy(Gen.ColorizeCopy(
-                    Gen.CreateLine(new Vector3(0,0,0), new Vector3(0,5,5), new Vector3(1,0,0), 0.1f),
-                    Vector4.One))),
-                GraphicsDevice)));
+            //scene = new Scene(new BoundingBox(new Vector3(-100, -100, -100), new Vector3(100, 100, 100)), 5.0f);
+            //scene.AddModel(new ModelComponent(GeometryGeneration.CompiledModel.CompileModel(
+            //    new RawModel(Gen.FacetCopy(Gen.ColorizeCopy(
+            //        Gen.CreateLine(new Vector3(0,0,0), new Vector3(0,5,5), new Vector3(1,0,0), 0.1f),
+            //        Vector4.One))),
+            //    GraphicsDevice)));
 
             dynamicConsole.Write("MISP Console\nKeyboard Controls:\nctrl+enter: send command\nctrl+up/down: scroll output\nshift+up/down: recall commands\n\n");
             
@@ -83,6 +83,9 @@ namespace XNAConsole
                     var math = Gem.Math.MispBinding.BindXNAMath();
                     engine.AddGlobalVariable("xna", c => math );
                     renderer.BindScript(engine);
+
+                    //var osm = StreetData.MispBinding.GenerateStaticBinding();
+                    //engine.AddGlobalVariable("osm", c => osm);
 
                    engine.AddFunction("recall", "Recall a function definition into the input box so it can be modified.",
                         (context, arguments) =>
@@ -146,7 +149,7 @@ namespace XNAConsole
 
                    engine.AddFunction("new-scene", "Create a new scene", (context, arguments) =>
                        {
-                           return new Scene(new BoundingBox(new Vector3(-100, -100, -100), new Vector3(100, 100, 100)), 5);
+                           return new Scene(new BoundingBox(new Vector3(-100000, -100000, -100000), new Vector3(100000, 100000, 100000)), 25);
                        });
 
                    engine.AddFunction("video-viewport", "Set the 3d viewport.",

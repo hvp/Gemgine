@@ -22,6 +22,7 @@ namespace Gem.Renderer
         Effect drawIDEffect;
         RenderTarget2D mousePickTarget;
         BlendState mousePickBlend = new BlendState();
+        RenderContext renderContext = new RenderContext();
 
         public RenderModule(GraphicsDevice device, ContentManager content)
         {
@@ -61,12 +62,10 @@ namespace Gem.Renderer
             var nodes = octTreeModule.Query(frustum).Distinct()
                 .Select(id => renderables.ContainsKey(id) ? renderables[id] : null);
 
+            renderContext.BeginScene(drawEffect, device);
             foreach (var node in nodes)
             {
-                drawEffect.Parameters["World"].SetValue(node.World);
-                drawEffect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(node.World)));
-                drawEffect.CurrentTechnique.Passes[0].Apply();
-                if (node != null) (node as IRenderable).Draw(device);
+                if (node != null) (node as IRenderable).DrawEx(renderContext);
             }
         }
 
@@ -84,31 +83,28 @@ namespace Gem.Renderer
                 .Select(id => renderables.ContainsKey(id) ? renderables[id] : null);
             drawIDEffect.CurrentTechnique = drawIDEffect.Techniques[0];
 
+            var context = new RenderIDContext();
+            context.BeginScene(drawIDEffect, device);
+
             foreach (var node in nodes)
                 if (node != null)
                 {
-                    drawIDEffect.Parameters["World"].SetValue(node.World);
+                    //drawIDEffect.Parameters["World"].SetValue(node.World);
                     //drawIDEffect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(node.World)));
 
                     var idBytes = BitConverter.GetBytes((node as Component).EntityID);
                     drawIDEffect.Parameters["ID"].SetValue(
                         new Vector4(idBytes[0] / 255.0f, idBytes[1] / 255.0f, idBytes[2] / 255.0f, idBytes[3] / 255.0f));
-                    drawIDEffect.CurrentTechnique.Passes[0].Apply();
-                    (node as IRenderable).Draw(device);
+                    //drawIDEffect.CurrentTechnique.Passes[0].Apply();
+                    (node as IRenderable).DrawEx(context);
+                    //(node as IRenderable).Draw(device);
                 }
 
             device.SetRenderTarget(null);
             var data = new Color[1];
             mousePickTarget.GetData(data);
             return data[0].PackedValue;
-            var bytes = new byte[]
-            {
-                (byte)(data[0].B * 256f),
-                (byte)(data[0].G * 256f),
-                (byte)(data[0].R * 256f),
-                (byte)(data[0].A * 256f)
-            };
-            return BitConverter.ToUInt32(bytes, 0);
+           
         }
 
         void IModule.BeginSimulation(Simulation sim)
@@ -136,12 +132,36 @@ namespace Gem.Renderer
 
         void IModule.BindScript(MISP.Engine scriptEngine)
         {
-            scriptEngine.AddFunction("c-model", "Create a model component.", (context, arguments) =>
+            var renderer = new MISP.GenericScriptObject();
+
+            renderer.AddFunction("create-scene-leaf", "Create a scene leaf.", (context, arguments) =>
                 {
                     var model = GeometryGeneration.MispBinding.ModelArgument(arguments[0]);
-                    return new ModelComponent(GeometryGeneration.CompiledModel.CompileModel(model, device));
+                    return new SceneNode
+                        {
+                            leaf = GeometryGeneration.CompiledModel.CompileModel(model, device)
+                        };
                 }, MISP.Arguments.Arg("model"));
 
+            renderer.AddFunction("create-scene-component", "Create a scene component.",
+                (context, arguments) =>
+            {
+                var r = new SceneGraphRoot();
+                foreach (var arg in arguments)
+                    if (arg is SceneNode)
+                        r.rootNode.Add(arg as SceneNode);
+                return r;
+            }, MISP.Arguments.Arg("leaf"));
+
+            renderer.AddFunction("query", "Query for a specific renderable.",
+                (context, arguments) =>
+                {
+                    var key = MISP.AutoBind.UIntArgument(arguments[0]);
+                    if (this.renderables.ContainsKey(key)) return this.renderables[key];
+                    return null;
+                }, MISP.Arguments.Arg("key"));
+
+            scriptEngine.AddGlobalVariable("renderer", context => renderer);
             var meshFunction = GeometryGeneration.MispBinding.GenerateBindingObject();
             scriptEngine.AddGlobalVariable("mesh", (context) => { return meshFunction; });
 

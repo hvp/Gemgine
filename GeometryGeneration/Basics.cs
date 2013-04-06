@@ -46,12 +46,12 @@ namespace GeometryGeneration
             return result;
         }
 
-        public void Transform(Mesh mesh, Matrix m)
+        public static void Transform(Mesh mesh, Matrix m)
         {
             Transform(mesh, m, 0, mesh.verticies.Length);
         }
 
-        public Mesh TransformCopy(Mesh mesh, Matrix m)
+        public static Mesh TransformCopy(Mesh mesh, Matrix m)
         {
             return TransformCopy(mesh, m, 0, mesh.verticies.Length);
         }

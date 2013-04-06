@@ -1,0 +1,44 @@
+(defun make-slider ((arg x)(arg y)(arg w)(arg h)(arg on-change))
+	(ui.create "slider"
+		(xna.rect.@construct x y w h)
+		(record
+			(bg-color (xna.v 0 0 0))
+			(fg-color (xna.v 1 0 0))
+			(step 1)
+			(minimum 0)
+			(maximum 100)
+			(handle-size 8)
+			(on-change on-change)
+		)
+	)
+)
+
+(let ((data (record)))
+	(nop
+
+(defun add-part ((arg id)(arg raw-mesh))
+	(nop
+		(create-entity id
+			(c-spacial (xna.v 0 0 0)) 
+			(renderer.create-scene-component (renderer.create-scene-leaf raw-mesh))
+		)
+		(on-click id (lambda "" ((arg id)) (set data active-part (renderer.query id))))
+	)
+)
+
+(add-part 0 (mesh.facet-copy (mesh.colorize-copy (mesh.create-cube) (xna.v 1 1 1 1))))
+
+
+(ui-root.AddChild 
+	(make-slider 32 32 16 128
+		(lambda "" ((arg slider)) 
+			(set data.active-part.rootNode localTransformation 
+				(xna.matrix.create-scale 
+					(+ 1 (/ (slider.get_position) 25.0))
+				)
+			)
+		)
+	)
+)
+
+))

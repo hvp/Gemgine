@@ -59,8 +59,9 @@ namespace XNAConsole
             
 
             var frustum = Camera.GetFrustum();
-            var nodes = octTreeModule.Query(frustum).Distinct();
+            //var nodes = octTreeModule.Query(frustum).Distinct();
                 //.Select(id => renderables.ContainsKey(id) ? renderables[id] : null);
+            var nodes = octTreeModule.allEntities.Select(p => p.Value.spacial);
 
             foreach (var node in nodes)
             {

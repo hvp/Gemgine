@@ -13,15 +13,15 @@ namespace GeometryGeneration
         {
             var result = new Mesh();
             result.verticies = new Vertex[8];
-            result.verticies[0].Position = new Vector3(0, 0, 0);
-            result.verticies[1].Position = new Vector3(1, 0, 0);
-            result.verticies[2].Position = new Vector3(1, 1, 0);
-            result.verticies[3].Position = new Vector3(0, 1, 0);
+            result.verticies[0].Position = new Vector3( -0.5f, -0.5f, -0.5f);
+            result.verticies[1].Position = new Vector3(  0.5f, -0.5f, -0.5f);
+            result.verticies[2].Position = new Vector3(  0.5f,  0.5f, -0.5f);
+            result.verticies[3].Position = new Vector3( -0.5f,  0.5f, -0.5f);
 
-            result.verticies[4].Position = new Vector3(0, 0, 1);
-            result.verticies[5].Position = new Vector3(1, 0, 1);
-            result.verticies[6].Position = new Vector3(1, 1, 1);
-            result.verticies[7].Position = new Vector3(0, 1, 1);
+            result.verticies[4].Position = new Vector3( -0.5f, -0.5f,  0.5f);
+            result.verticies[5].Position = new Vector3(  0.5f, -0.5f,  0.5f);
+            result.verticies[6].Position = new Vector3(  0.5f,  0.5f,  0.5f);
+            result.verticies[7].Position = new Vector3( -0.5f,  0.5f,  0.5f);
 
             result.indicies = new short[] { 
                 0, 1, 2, 

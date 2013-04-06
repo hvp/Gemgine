@@ -21,9 +21,8 @@ namespace MISP
         public Action<Engine> SetupHost;
         public bool noEcho = false;
 
-        public Environment AddEnvironment(String name, Engine engine, Context context)
+        public void PrepareEnvironment(Engine engine)
         {
-            environments.Upsert(name, new Environment { engine = engine, context = context, name = name });
             SetupStandardConsoleFunctions(engine);
             if (SetupHost != null) SetupHost(engine);
             engine.AddFunction("run-file", "Load and run a file.",
@@ -33,6 +32,12 @@ namespace MISP
                     return engine.EvaluateString(_context, text, ScriptObject.AsString(arguments[0]), false);
                 },
                 Arguments.Arg("name"));
+        }
+
+
+        public Environment AddEnvironment(String name, Engine engine, Context context)
+        {
+            environments.Upsert(name, new Environment { engine = engine, context = context, name = name });
             return environments[name];
         }
 
@@ -65,12 +70,13 @@ namespace MISP
                     if (l.Count > 0)
                     {
                         Write("list [" + l.Count + "] (\n");
-                        foreach (var item in l)
+                        for (int i = 0; i < l.Count && i < 20; ++i)
                         {
                             Write(new String('.', depth * 3 + 1));
-                            Write(PrettyPrint2(item, depth + 1));
+                            Write(PrettyPrint2(l[i], depth + 1));
                             Write("\n");
                         }
+                        if (l.Count >= 20) Write("...and additional items.\n");
                         Write(new String('.', depth * 3) + ")\n");
                     }
                     else
@@ -109,6 +115,7 @@ namespace MISP
         {
             var mispEngine = new Engine();
             var mispContext = new Context();
+            PrepareEnvironment(mispEngine);
             var environment = AddEnvironment(name, mispEngine, mispContext);
             mispContext.limitExecutionTime = false;
  
@@ -178,7 +185,14 @@ namespace MISP
                     }
                     return null;
                 }, Arguments.Optional("list"));
-            
+
+            mispEngine.AddFunction("module", "Load a module from disc",
+                (context, arguments) =>
+                {
+                    return NetModule.LoadModule(mispEngine, AutoBind.StringArgument(arguments[0]),
+                        AutoBind.StringArgument(arguments[1]));
+                }, Arguments.Arg("file"), Arguments.Arg("module"));
+
         }
 
         private void EmitFunctionListItem(ScriptObject item)
@@ -204,9 +218,23 @@ namespace MISP
             {
                 var newContext = new Context();
                 var newEngine = new Engine();
+
+                PrepareEnvironment(newEngine);
+
+                if (arguments[2] != null)
+                {
+                    newEngine.Evaluate(newContext, arguments[2], true, true);
+                    if (newContext.evaluationState == EvaluationState.UnwindingError)
+                    {
+                        Write("Prime error:\n");
+                        Write(MISP.Console.PrettyPrint2(newContext.errorObject, 0));
+                        return false;
+                    }
+                }
+
                 var result = newEngine.EvaluateString(newContext,
                     System.IO.File.ReadAllText(arguments[0].ToString()), arguments[0].ToString()) as ScriptObject;
-                
+
 
                 if (newContext.evaluationState == EvaluationState.Normal)
                 {
@@ -228,7 +256,7 @@ namespace MISP
                     Write(MISP.Console.PrettyPrint2(newContext.errorObject, 0));
                     return false;
                 }
-            }, Arguments.Arg("file"), Arguments.Arg("name"));
+            }, Arguments.Arg("file"), Arguments.Arg("name"), Arguments.Optional(Arguments.Lazy("prime")));
         }
 
         public void ExecuteCommand(String str)
@@ -280,7 +308,7 @@ namespace MISP
                     else
                     {
                         Write("Error:\n");
-                        Write(MISP.Engine.TightFormat(environment.context.errorObject));
+                        Write(MISP.Console.PrettyPrint2(environment.context.errorObject, 1));
                     }
 
                     if (!environment.context.CheckScope())

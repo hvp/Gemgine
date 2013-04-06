@@ -79,8 +79,7 @@ namespace ContentManifestExtensions
                 var DependencyManifest = this.Load<ContentManifestExtensions.Manifest>(Dependency + "/manifest");
                 if (DependencyManifest == null) continue;
 
-                Module.Manifest.Entries =
-                    Module.Manifest.Entries.Union(DependencyManifest.Entries) as List<ContentManifestExtensions.Entry>;
+                Module.Manifest.Entries = new List<Entry>(Module.Manifest.Entries.Union(DependencyManifest.Entries));
             }
 
             Constructed = true;

@@ -10,11 +10,10 @@
 		(print "Creating interactive cube.")
 		(let (
 			(spacial (c-spacial (xna.v 0 0 0)))
+			(cube (mesh.facet-copy (mesh.colorize-copy (mesh.create-cube) (xna.v 1 1 1 1))))
 			)
 			(nop
-				(create-entity 0 spacial
-					(c-model (((mesh.cube).Color (xna.v 1 1 1 1)).Facet))
-				)
+				(create-entity 0 spacial (c-model cube))
 				(on-click 0 (message 42))
 			)
 		)

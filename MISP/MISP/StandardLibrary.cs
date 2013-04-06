@@ -268,6 +268,15 @@ namespace MISP
                 },
                 Arguments.Arg("func", "Must be a function."));
 
+            AddFunction("serialize", "Serialize an object",
+                (context, arguments) =>
+                {
+                    var stream = new System.IO.StringWriter();
+                    SerializeObject(stream, arguments[0] as ScriptObject);
+                    return stream.ToString();
+                },
+                    Arguments.Arg("object"));
+
 
             SetupVariableFunctions();
             SetupObjectFunctions();

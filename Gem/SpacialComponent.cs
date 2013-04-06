@@ -15,6 +15,14 @@ namespace Gem
         private Quaternion _orientation;
         private BoundingSphere _boundingVolume = new BoundingSphere(Vector3.Zero, 1.0f);
 
+        public Matrix Transform
+        {
+            get
+            {
+                return Matrix.CreateFromQuaternion(Orientation) * Matrix.CreateTranslation(Position);
+            }
+        }
+
         public Vector3 Position
         {
             get { return _position; }

@@ -20,7 +20,7 @@ namespace Gem
         private Common.BufferedList<Tuple<String, MISP.ScriptList>> eventQueue = 
             new Common.BufferedList<Tuple<String, MISP.ScriptList>>();
         private float cachedElapsedSeconds;
-        
+
         public bool IsLocalEntity(UInt32 id)
         {
             return id >= 0x80000000;
@@ -42,7 +42,6 @@ namespace Gem
 
             #region MISP Bindings
             #region System
-            Gui.MispBinding.Bind(scriptEngine);
             scriptEngine.AddGlobalVariable("sim", (context) => { return this; });
             var xna = Gem.Math.MispBinding.BindXNAMath();
             scriptEngine.AddGlobalVariable("xna", (context) => { return xna; });
@@ -140,8 +139,8 @@ namespace Gem
         {
             try
             {
-                var r = Content.OpenUnbuiltTextStream(name + ".msp");
-                return r.ReadToEnd();
+                var r = Content.Load<String>(name);// Content.OpenUnbuiltTextStream(name);
+                return r;//.ReadToEnd();
             }
             catch (Microsoft.Xna.Framework.Content.ContentLoadException)
             {
@@ -158,12 +157,23 @@ namespace Gem
 
         public Object runScript(String name)
         {
-            PrepareContext();
-            return scriptEngine.EvaluateString(scriptContext, tryGetScript(name), name, true);
-            if (scriptContext.evaluationState == MISP.EvaluationState.UnwindingError)
+            try
             {
-                Console.Write("Error:\n");
-                Console.Write(MISP.Console.PrettyPrint2(scriptContext.errorObject, 0));
+                PrepareContext();
+                var r = scriptEngine.EvaluateString(scriptContext, tryGetScript(name), name, true);
+                if (scriptContext.evaluationState == MISP.EvaluationState.UnwindingError)
+                {
+                    debug("Error:\n");
+                    debug(MISP.Console.PrettyPrint2(scriptContext.errorObject, 0));
+                }
+                return r;
+            }
+            catch (Exception e)
+            {
+                debug("System Error:\n");
+                debug(e.Message);
+                debug(e.StackTrace);
+                return null;
             }
         }
 
@@ -206,23 +216,23 @@ namespace Gem
                         args.RemoveAt(0);
                     }
                     else
-                        Console.WriteLine("Invalid input event.");
+                        debug("Invalid input event.");
                 }
                 else
                     handler = eventHandlers.GetLocalProperty(e.Item1);
-                if (handler == null) Console.Write("Invalid queued event.");
+                if (handler == null) debug("Invalid queued event.");
                 if (handler is MISP.ScriptObject && MISP.Function.IsFunction(handler as MISP.ScriptObject))
                 {
                     PrepareContext();
-                    MISP.Function.Invoke(handler as MISP.ScriptObject, scriptEngine, scriptContext, e.Item2);
+                    MISP.Function.Invoke(handler as MISP.ScriptObject, scriptEngine, scriptContext, args);
                     if (scriptContext.evaluationState == MISP.EvaluationState.UnwindingError)
                     {
-                        Console.Write("Error:\n");
-                        Console.Write(MISP.Console.PrettyPrint2(scriptContext.errorObject, 0));
+                        debug("Error:\n");
+                        debug(MISP.Console.PrettyPrint2(scriptContext.errorObject, 0));
                     }
                 }
                 else
-                    Console.WriteLine("Invalid event handler.");
+                    debug("Invalid event handler.");
             }
             eventQueue.ClearFront();
         }

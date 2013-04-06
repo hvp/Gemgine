@@ -23,18 +23,12 @@ namespace Gem
 
         public bool MouseHandled { get; set; }
         public float ElapsedSeconds { get; set; }
-        public Gui.UIItem keyboardFocus = null;
 
         public UInt32 MouseObject { get; set; }
 
         public Input(IntPtr windowHandle)
         {
             textHook = new XnaTextInput.TextInputHandler(windowHandle);
-            textHook.KeyPress += (hook, key) =>
-                {
-                    if (keyboardFocus != null)
-                        keyboardFocus.KeyboardEvent(key);
-                };
         }
 
         public void Update(float ElapsedSeconds)

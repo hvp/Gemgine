@@ -33,7 +33,7 @@ namespace Gem.Network
 
             try
             {
-                netSession = new Network.ServerSession(port, Console.WriteLine);
+                netSession = new Network.ServerSession(port, sim.debug);
 
                 netSession.onClientJoined += (client) =>
                 {

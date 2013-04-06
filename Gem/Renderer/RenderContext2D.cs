@@ -81,9 +81,10 @@ namespace Gem.Renderer
             set { Effect.Alpha = value; stateChanges = true; }
         }
 
-        public void BeginScene()
+        public void BeginScene(RenderTarget2D target = null)
         {
             stateChanges = true;
+            GraphicsDevice.SetRenderTarget(target);
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
             GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
             GraphicsDevice.BlendState = BlendState.AlphaBlend;

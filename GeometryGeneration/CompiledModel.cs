@@ -69,18 +69,19 @@ namespace GeometryGeneration
             result.verticies.SetData(combinedVertex);
             result.indicies.SetData(combinedIndex);
             result.primitiveCount = combinedIndex.Length / 3;
+            result.boundingSphere = new BoundingSphere(Vector3.Zero, 1);
 
-            var largestDistance = 0.0f;
-            foreach (var v0 in combinedVertex)
-                foreach (var v1 in combinedVertex)
-                {
-                    var v = v1.Position - v0.Position;
-                    if (v.LengthSquared() > largestDistance)
-                    {
-                        largestDistance = v.LengthSquared();
-                        result.boundingSphere = new BoundingSphere((v0.Position + v1.Position) / 2.0f, v.Length() / 2.0f);
-                    }
-                }
+            //var largestDistance = 0.0f;
+            //foreach (var v0 in combinedVertex)
+            //    foreach (var v1 in combinedVertex)
+            //    {
+            //        var v = v1.Position - v0.Position;
+            //        if (v.LengthSquared() > largestDistance)
+            //        {
+            //            largestDistance = v.LengthSquared();
+            //            result.boundingSphere = new BoundingSphere((v0.Position + v1.Position) / 2.0f, v.Length() / 2.0f);
+            //        }
+            //    }
 
             return result;
         }

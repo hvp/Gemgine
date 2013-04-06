@@ -55,7 +55,7 @@ namespace Gem
 
             if (Input.MousePressed())
                 if (clickBindings.ContainsKey(Input.MouseObject))
-                    sim.EnqueueEvent("@raw-input-event", new ScriptList(clickBindings[Input.MouseObject]));
+                    sim.EnqueueEvent("@raw-input-event", new ScriptList(clickBindings[Input.MouseObject], Input.MouseObject));
         }
 
         void IModule.BeginSimulation(Simulation sim)
@@ -148,13 +148,12 @@ namespace Gem
                     {
                         var objectID = AutoBind.UIntArgument(arguments[0]);
                         var body = arguments[1];
-                        var lambda = Function.MakeFunction("on-click lambda", new ScriptList(), "",
-                            body as ScriptObject, context.Scope, true);
-                        clickBindings.Upsert(objectID, lambda);
+                        if (!(body is ScriptObject)) return null;
+                        clickBindings.Upsert(objectID, body as ScriptObject);
                         return true;
                     },
                 Arguments.Arg("object-id", "id of the clicked object."),
-                Arguments.Lazy("code"));
+                Arguments.Arg("lambda"));
         }
     }
 }

@@ -13,7 +13,7 @@ namespace XNAConsole
     {
         private OctCell octTreeRoot;
         private float minimumLeafSize;
-        private Dictionary<UInt32, OctNode> allEntities = new Dictionary<uint, OctNode>();
+        public Dictionary<int, OctNode> allEntities = new Dictionary<int, OctNode>();
 
         public Scene(BoundingBox worldBounds, float leafSize)
         {
@@ -28,7 +28,7 @@ namespace XNAConsole
             model.OnBoundsChanged += (m) => { if (allEntities.ContainsKey(m.id)) allEntities[m.id].boundsChanged = true; };
         }
 
-        public void RemoveModel(UInt32 id)
+        public void RemoveModel(int id)
         {
                 if (allEntities.ContainsKey(id))
                 {

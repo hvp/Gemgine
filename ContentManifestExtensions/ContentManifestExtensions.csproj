@@ -40,6 +40,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MISPPipeline.cs" />
     <Compile Include="Episode.cs" />
     <Compile Include="Manifest.cs" />
     <Compile Include="ManifestPipeline.cs" />

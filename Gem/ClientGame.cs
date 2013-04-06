@@ -51,7 +51,8 @@ namespace Gem
             simulation = new Simulation(Main.Content, new MISP.GenericScriptObject(
                 "episode-name", episodeName, "server", null));
             simulation.Content.FrontLoadTextures();
-            Console.WriteLine("Started client simulation with episode " + episodeName);
+            Main.Write("Started client simulation with episode " + episodeName + "\n");
+            Main.ScriptEngine.PrepareEnvironment(simulation.scriptEngine);
             Main.ScriptEngine.AddEnvironment("client", simulation.scriptEngine, simulation.scriptContext);
             //simulation.scriptEngine.AddGlobalVariable("ui", (context) => { return uiRoot; });
             //uiRoot.children.Clear();

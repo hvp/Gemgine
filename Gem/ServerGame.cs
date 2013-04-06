@@ -32,28 +32,20 @@ namespace Gem
 
         public void Begin()
         {
-            try
-            {
-                simulation = new Simulation(Main.Content, new MISP.GenericScriptObject("episode-name", episodeName,
-                    "server", true));
-                System.Console.WriteLine("Started server simulation with episode " + episodeName);
-                simulation.modules.Add(serverModule);
-                simulation.beginSimulation();
+            simulation = new Simulation(Main.Content, new MISP.GenericScriptObject("episode-name", episodeName,
+                "server", true));
+            Main.Write("Started server simulation with episode " + episodeName + "\n");
+            simulation.modules.Add(serverModule);
+            simulation.beginSimulation();
 
-                clientGame = new ClientGame(System.Net.IPAddress.Loopback, port);
-                clientGame.Input = Input;
-                clientGame.Main = Main;
-                clientGame.Begin();
+            clientGame = new ClientGame(System.Net.IPAddress.Loopback, port);
+            clientGame.Input = Input;
+            clientGame.Main = Main;
+            clientGame.Begin();
 
-                Main.ScriptEngine.AddEnvironment("server", simulation.scriptEngine, simulation.scriptContext);
+            Main.ScriptEngine.PrepareEnvironment(simulation.scriptEngine);
+            Main.ScriptEngine.AddEnvironment("server", simulation.scriptEngine, simulation.scriptContext);
 
-            }
-            catch (Exception e)
-            {
-                
-                System.Console.WriteLine("While trying to create a server game, " + e.Message);
-                throw e;
-            }
         }
 
         public void End()

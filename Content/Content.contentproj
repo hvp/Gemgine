@@ -82,16 +82,25 @@
       <Processor>ManifestProcessor</Processor>
       <Importer>ManifestImporter</Importer>
     </Compile>
-    <None Include="startup.msp">
+    <Compile Include="startup.msp">
       <Name>startup</Name>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+      <Importer>MISPImporter</Importer>
+      <Processor>PassThroughProcessor</Processor>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ContentManifestExtensions\ContentManifestExtensions.csproj">
       <Project>{F4CDBC64-A84A-41CD-A941-418B67578AF7}</Project>
       <Name>ContentManifestExtensions</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="small-font.png">
+      <Name>small-font</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
   <!--  To modify your build process, add your task inside one of the targets below and uncomment it. 

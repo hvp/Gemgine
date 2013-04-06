@@ -4,15 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 
-namespace XNAConsole.StreetData
+namespace OSM
 {
     public static class Import
     {
-        public static Data ImportRawOSM(String filename)
+        public static void ImportRawOSM(String filename, Action<Entry> entryHandler)
         {
-            var idMap = new Dictionary<Int64, Int64>();
-            var data = new Data();
-
             var reader = new XmlTextReader(filename);
             reader.ReadToFollowing("osm");
             reader.MoveToContent();
@@ -29,45 +26,23 @@ namespace XNAConsole.StreetData
                 if (type == "node")
                 {
                     var id = Int64.Parse(reader.GetAttribute("id"));
-                    var lat = Double.Parse(reader.GetAttribute("lat"));
-                    var lon = Double.Parse(reader.GetAttribute("lon"));
+                    var lat = Single.Parse(reader.GetAttribute("lat"));
+                    var lon = Single.Parse(reader.GetAttribute("lon"));
 
-                    data.Add(new Node { ID = data.Count, lat = lat, lon = lon });
-                    idMap.Add(id, data.Count - 1);
-                    reader.Read();
-
-                }
-                else if (type == "bound")
-                {
-                    var str = reader.GetAttribute("box");
-                    var parts = str.Split(',');
-                    data.boundsMinLat = double.Parse(parts[0]);
-                    data.boundsMinLon = double.Parse(parts[1]);
-                    data.boundsMaxLat = double.Parse(parts[2]);
-                    data.boundsMaxLon = double.Parse(parts[3]);
+                    entryHandler(new Node { id = id, lat = lat, lon = lon });
                     reader.Read();
                 }
                 else if (type == "way")
                 {
                     var id = Int64.Parse(reader.GetAttribute("id"));
-                    var nodeChain = new IDList();
+                    var nodeChain = new List<Int64>();
                     String name = null;
 
                     while (reader.ReadState == ReadState.Interactive)
                     {
                         if (reader.NodeType == XmlNodeType.EndElement && reader.Name == "way")
                         {
-                            for (int i = 0; i < nodeChain.Count; ++i)
-                            {
-                                if (!idMap.ContainsKey(nodeChain[i]))
-                                {
-                                    reader.Read();
-                                    goto outerLoop;
-                                }
-                                nodeChain[i] = idMap[nodeChain[i]];
-                            }
-
-                            data.Add(new Way { ID = data.Count, name = (name ?? "").ToUpper(), nodes = nodeChain });
+                            entryHandler(new Way { id = id, name = (name ?? "").ToUpper(), nodes = nodeChain });
                             reader.Read();
                             goto outerLoop;
                         }
@@ -95,8 +70,6 @@ namespace XNAConsole.StreetData
                 }
             outerLoop: ;
             }
-
-            return data;
         }
     }
 }

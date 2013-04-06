@@ -26,17 +26,22 @@ namespace Gem.Gui
             Hover = false;
         }
 
-        public virtual void Update(Input input)
+        public virtual void Update(Input input, GuiModule module)
         { 
             Hover = input.MouseInside(rect);
+            if (Hover && input.MousePressed())
+            {
+                if (settings["on-click"] != null)
+                    module.ButtonEvent(settings["on-click"], this);
+                input.MouseHandled = true;
+            }
             if (Visible) 
-                foreach (var child in children) child.Update(input);
+                foreach (var child in children) child.Update(input, module);
         }
 
-        public virtual void KeyboardEvent(System.Windows.Forms.KeyPressEventArgs args)
-        {
-
-        }
+        public virtual void KeyPressEvent(System.Windows.Forms.KeyPressEventArgs args) { }
+        public virtual void KeyDownEvent(System.Windows.Forms.KeyEventArgs args) { }
+        public virtual void KeyUpEvent(System.Windows.Forms.KeyEventArgs args) { }
 		
 		public virtual void AddChild(UIItem child)
 		{
@@ -57,12 +62,23 @@ namespace Gem.Gui
 			parent = null;
 		}
 
-        private Object GetSetting(String name, Object _default)
+        protected Object GetSetting(String name, Object _default)
         {
             if (Hover && hoverSettings != null && hoverSettings[name] != null) return hoverSettings[name];
             if (settings != null && settings[name] != null) return settings[name];
             if (defaults != null && defaults[name] != null) return defaults[name];
             return _default;
+        }
+
+        protected int GetIntegerSetting(String name, int _default)
+        {
+            var setting = GetSetting(name, null);
+            if (setting == null) return _default;
+            try
+            {
+                return Convert.ToInt32(setting);
+            }
+            catch (Exception) { return _default; }
         }
 		
 		public virtual void Render(Renderer.RenderContext2D context) 

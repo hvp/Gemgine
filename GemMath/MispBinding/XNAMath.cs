@@ -30,9 +30,10 @@ namespace Gem.Math
 
             xna.SetProperty("matrix", AutoBind.GenerateLazyBindingObjectForStaticLibrary(typeof(Matrix)));
             xna.SetProperty("quat", AutoBind.GenerateLazyBindingObjectForStaticLibrary(typeof(Quaternion)));
-            xna.SetProperty("v2", AutoBind.GenerateLazyBindingObjectForStaticLibrary(typeof(Vector2)));
-            xna.SetProperty("v3", AutoBind.GenerateLazyBindingObjectForStaticLibrary(typeof(Vector3)));
-            xna.SetProperty("v4", AutoBind.GenerateLazyBindingObjectForStaticLibrary(typeof(Vector4)));
+            xna.SetProperty("v2", AutoBind.GenerateLazyBindingObjectForStaticLibrary(typeof(Vector2), true));
+            xna.SetProperty("v3", AutoBind.GenerateLazyBindingObjectForStaticLibrary(typeof(Vector3), true));
+            xna.SetProperty("v4", AutoBind.GenerateLazyBindingObjectForStaticLibrary(typeof(Vector4), true));
+            xna.SetProperty("rect", AutoBind.GenerateLazyBindingObjectForStaticLibrary(typeof(Rectangle), true));
 
             return xna;
         }

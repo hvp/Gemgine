@@ -5,7 +5,7 @@
     <ProjectTypeGuids>{6D335F3A-9D43-41b4-9D22-F6F17C4BE596};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Gem</RootNamespace>
     <AssemblyName>Gem</AssemblyName>
@@ -119,6 +119,8 @@
     <Compile Include="Common\DelayList.cs" />
     <Compile Include="Common\Directions.cs" />
     <Compile Include="Common\Grid.cs" />
+    <Compile Include="Gui\Slider.cs" />
+    <Compile Include="MenuGame.cs" />
     <Compile Include="Gui\GuiModule.cs" />
     <Compile Include="InputModule.cs" />
     <Compile Include="Network\ScriptMessage.cs" />
@@ -128,15 +130,14 @@
     <Compile Include="ClientGame.cs" />
     <Compile Include="Component.cs" />
     <Compile Include="Network\ClientModule.cs" />
+    <Compile Include="Renderer\RenderContext.cs" />
     <Compile Include="Renderer\ModelComponent.cs" />
     <Compile Include="Renderer\RenderModule.cs" />
     <Compile Include="OctTreeModule\OctTreeModule.cs" />
     <Compile Include="IModule.cs" />
     <Compile Include="Network\ServerModule.cs" />
-    <Compile Include="GuiDemo.cs" />
     <Compile Include="Gui\BitmapFont.cs" />
     <Compile Include="Gui\BorderLayout.cs" />
-    <Compile Include="Gui\Button.cs" />
     <Compile Include="Gui\DrawBorder.cs" />
     <Compile Include="Gui\FlowLayout.cs" />
     <Compile Include="Gui\GridLayout.cs" />
@@ -186,6 +187,10 @@
       <Name>Content</Name>
       <XnaReferenceType>Content</XnaReferenceType>
     </ProjectReference>
+    <ProjectReference Include="..\GemConsole\GemConsole.csproj">
+      <Project>{DFA68ADE-D3D7-438D-B3A6-8EE0DE129FE0}</Project>
+      <Name>GemConsole</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GemMath\GemMath.csproj">
       <Project>{470C59FC-DA9D-466F-B9DD-B60A55054AC8}</Project>
       <Name>GemMath</Name>
@@ -193,6 +198,11 @@
     <ProjectReference Include="..\GeometryGeneration\GeometryGeneration.csproj">
       <Project>{546EEE22-4EB5-4330-B731-E8C77A7CF705}</Project>
       <Name>GeometryGeneration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MainMenuEpisode\MainMenuEpisode.contentproj">
+      <Project>{A139CBC5-A525-4AB6-96A2-27E72FF77F2B}</Project>
+      <Name>MainMenuEpisode</Name>
+      <XnaReferenceType>Content</XnaReferenceType>
     </ProjectReference>
     <ProjectReference Include="..\MISP\MISP\MISP.csproj">
       <Project>{BA7D4BAE-B4B5-40BC-8E73-6743E260F7BC}</Project>

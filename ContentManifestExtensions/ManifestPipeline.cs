@@ -17,7 +17,7 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 namespace ContentManifestExtensions
 {
     // the importer is just a passthrough that gives the processor the filepath
-    [ContentImporter(".msp", DisplayName = "MISP Script Importer", DefaultProcessor = "MISPScriptProcessor")]
+    [ContentImporter(".manifest", DisplayName = "Manifest Importer", DefaultProcessor = "ManifestProcessor")]
     public class ManifestImporter : ContentImporter<string>
     {
         public override string Import(string filename, ContentImporterContext context)
@@ -96,18 +96,10 @@ namespace ContentManifestExtensions
                 entry.Name = assetPath;
                 entry.Type = ContentType.Unknown;
 
-                if (extension == ".map")
-                    entry.Type = ContentType.Map;
-                else if (extension == ".conv")
-                    entry.Type = ContentType.Conversation;
-                else if (extension == ".pfx")
-                    entry.Type = ContentType.ParticleEffect;
+                if (extension == ".msp")
+                    entry.Type = ContentType.MISPScript;
                 else if (extension == ".xml")
                     entry.Type = ContentType.XML;
-                else if (extension == ".jmd")
-                    entry.Type = ContentType.Model;
-                else if (extension == ".jma")
-                    entry.Type = ContentType.Animation;
                 else
                 {
                     string Importer = asset.Descendants(xmlns + "Importer").First().Value;

@@ -9,7 +9,7 @@ namespace XNAConsole
 {
     public class ModelComponent
     {
-        public UInt32 id;
+        public int id;
 
         public Action<ModelComponent> OnBoundsChanged;
 

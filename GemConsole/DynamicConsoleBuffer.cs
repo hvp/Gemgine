@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 
-namespace XNAConsole
+namespace Gem.Console
 {
-    public class DynamicConsole
+    public class DynamicConsoleBuffer
     {
         private String output;
 
@@ -31,7 +31,7 @@ namespace XNAConsole
         public int maxInputLines { get; set; }
         TextDisplay display;
         
-        public DynamicConsole(int scrollbackSize, TextDisplay display)
+        public DynamicConsoleBuffer(int scrollbackSize, TextDisplay display)
         {
             this.scrollbackSize = scrollbackSize;
             Reset(display);
