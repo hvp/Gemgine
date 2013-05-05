@@ -26,17 +26,19 @@ namespace Gem.Gui
         public int handle_size { get { return GetIntegerSetting("handle-size", 8); } }
         public int get_position() { return position; }
 
-        public override void Update(Input input, GuiModule module)
+        public override void HandleMouse(bool mouseValid, int x, int y, Input input, GuiModule module)
         {
-            base.Update(input, module);
+            base.HandleMouse(mouseValid, x, y, input, module);
+
+            if (!mouseValid) return;
 
             if (input.MousePressed())
             {
-                if (rect.Contains(input.MouseX, input.MouseY))
+                if (rect.Contains(x, y))
                 {
-                    var mouseOffset = input.MouseY - rect.Y - (handle_size / 2);
+                    var mouseOffset = y - rect.Y - (handle_size / 2);
 
-                    mouseStart = input.MouseY;
+                    mouseStart = y;
 
                     var hitPlace = mouseOffset + (spaceSize / 2);
                     var hitSpace = hitPlace / spaceSize;
@@ -45,14 +47,15 @@ namespace Gem.Gui
                     draggingHandle = true;
                     startPosition = position;
 
-                    if (settings["on-change"] != null)
-                        module.ButtonEvent(settings["on-change"], this);
+                    var handler = GetSetting("on-change", null);
+                    if (handler != null)
+                        module.ButtonEvent(handler, this);
                 }
             }
 
             if (input.MouseDown() && draggingHandle)
             {
-                var mouseDelta = input.MouseY - mouseStart;
+                var mouseDelta = y - mouseStart;
 
                 var stepsPassed = mouseDelta / spaceSize;
                 position = startPosition + (int)(stepsPassed * step);
@@ -60,8 +63,9 @@ namespace Gem.Gui
                 if (position < minimum) position = minimum;
                 if (position > maximum) position = maximum;
 
-                if (settings["on-change"] != null)
-                    module.ButtonEvent(settings["on-change"], this);
+                var handler = GetSetting("on-change", null);
+                if (handler != null)
+                    module.ButtonEvent(handler, this);
             }
 
             if (input.MouseReleased())

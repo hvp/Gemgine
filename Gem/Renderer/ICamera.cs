@@ -22,5 +22,8 @@ namespace Gem.Renderer
         void Pitch(float f);
         void Roll(float f);
         void Pan(float X, float Y, float speed);
+        void Zoom(float d);
+
+        Vector3 GetPosition();
     }
 }

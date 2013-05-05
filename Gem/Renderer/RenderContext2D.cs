@@ -88,6 +88,7 @@ namespace Gem.Renderer
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
             GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
             GraphicsDevice.BlendState = BlendState.AlphaBlend;
+            GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Transparent);
         }
 
         public void Apply()

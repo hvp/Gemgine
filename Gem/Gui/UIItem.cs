@@ -28,7 +28,7 @@ namespace Gem.Gui
 
         public virtual void Update(Input input, GuiModule module)
         { 
-            Hover = input.MouseInside(rect);
+            //Hover = input.MouseInside(rect);
             if (Hover && input.MousePressed())
             {
                 if (settings["on-click"] != null)
@@ -37,6 +37,21 @@ namespace Gem.Gui
             }
             if (Visible) 
                 foreach (var child in children) child.Update(input, module);
+        }
+
+        public virtual void HandleMouse(bool mouseValid, int x, int y, Input input, GuiModule module)
+        {
+            Hover = mouseValid && rect.Contains(x, y);
+            if (Hover && input.MousePressed())
+            {
+                var handler = GetSetting("on-click", null);
+                if (handler != null)
+                    module.ButtonEvent(handler, this);
+                input.MouseHandled = true;
+            }
+            if (Visible)
+                foreach (var child in children) child.HandleMouse(mouseValid, x, y, input, module);
+           
         }
 
         public virtual void KeyPressEvent(System.Windows.Forms.KeyPressEventArgs args) { }
@@ -87,9 +102,12 @@ namespace Gem.Gui
             {
                 if (GetSetting("hidden-container", null) == null)
                 {
-                    context.Texture = context.White;
-                    context.Color = (GetSetting("bg-color", Vector3.One) as Vector3?).Value;
-                    context.Quad(rect);
+                    if (GetSetting("transparent", null) == null)
+                    {
+                        context.Texture = context.White;
+                        context.Color = (GetSetting("bg-color", Vector3.One) as Vector3?).Value;
+                        context.Quad(rect);
+                    }
 
                     var label = GetSetting("label", null);
                     var font = GetSetting("font", null);

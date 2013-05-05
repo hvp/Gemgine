@@ -69,7 +69,7 @@ namespace Gem
 
             mouseLabel = new UIItem(new Rectangle(0, 0, 128, 64));
             mouseLabel.settings = new MISP.GenericScriptObject("bg-color", new Vector3(1, 1, 1));
-            guiModule.uiRoot.AddChild(mouseLabel);
+            //guiModule.uiRoot.AddChild(mouseLabel);
         }
 
         public void End()
@@ -98,7 +98,6 @@ namespace Gem
                 renderModule.Draw(octTreeModule);
                 Input.MouseObject = mouseClickID;
             }
-            if (guiModule != null) guiModule.Draw(Main.GraphicsDevice);
         }
     }
 }

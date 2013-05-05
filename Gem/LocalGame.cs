@@ -12,7 +12,7 @@ using Gem.Gui;
 
 namespace Gem
 {
-    public class MenuGame : IGame
+    public class LocalGame : IGame
     {
         public Input Input { get; set; }
         public Main Main { get; set; }
@@ -24,7 +24,7 @@ namespace Gem
         GuiModule guiModule = null;
         InputModule inputModule = null;
 
-        public MenuGame()
+        public LocalGame()
         {
         }
 
@@ -50,15 +50,15 @@ namespace Gem
 
             simulation.beginSimulation();
 
-            var labelString = "Jemgine";
+            //var labelString = "Jemgine";
 
-            var label = new UIItem(Layout.CenterItem(new Rectangle(0, 0, 10 * labelString.Length, 16),
-                Main.GraphicsDevice.Viewport.Bounds));
-            label.settings = new MISP.GenericScriptObject(
-                "bg-color", new Vector3(0, 0, 0),
-                "text-color", new Vector3(1,1,1),
-                "label", labelString);
-            guiModule.uiRoot.AddChild(label);
+            //var label = new UIItem(Layout.CenterItem(new Rectangle(0, 0, 10 * labelString.Length, 16),
+            //    Main.GraphicsDevice.Viewport.Bounds));
+            //label.settings = new MISP.GenericScriptObject(
+            //    "bg-color", new Vector3(0, 0, 0),
+            //    "text-color", new Vector3(1,1,1),
+            //    "label", labelString);
+            //guiModule.uiRoot.AddChild(label);
         }
 
         public void End()
@@ -78,7 +78,6 @@ namespace Gem
         {
             Input.MouseObject = renderModule.MousePick(octTreeModule, new Vector2(Input.MouseX, Input.MouseY));
             renderModule.Draw(octTreeModule);
-            guiModule.Draw(Main.GraphicsDevice);
         }
     }
 }

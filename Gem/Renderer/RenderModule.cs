@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Content;
 using Gem;
 using Gem.Renderer;
 using Gem.Common;
+using GeometryGeneration;
 
 namespace Gem.Renderer
 {
@@ -23,6 +24,14 @@ namespace Gem.Renderer
         RenderTarget2D mousePickTarget;
         BlendState mousePickBlend = new BlendState();
         RenderContext renderContext = new RenderContext();
+
+        List<Tuple<VertexPositionColor, VertexPositionColor>> debugLines = 
+            new List<Tuple<VertexPositionColor, VertexPositionColor>>();
+
+        public void AddDebugLine(VertexPositionColor a, VertexPositionColor b)
+        {
+            debugLines.Add(new Tuple<VertexPositionColor, VertexPositionColor>(a, b));
+        }
 
         public RenderModule(GraphicsDevice device, ContentManager content)
         {
@@ -41,36 +50,51 @@ namespace Gem.Renderer
 
         public void Draw(OctTreeModule octTreeModule)
         {
-            device.SetRenderTarget(null);
-            device.Clear(Color.Black);
-            device.BlendState = BlendState.AlphaBlend;
-            device.DepthStencilState = DepthStencilState.Default;
-
-            drawEffect.Parameters["World"].SetValue(Matrix.Identity);
-            drawEffect.Parameters["View"].SetValue(Camera.View);
-            drawEffect.Parameters["Projection"].SetValue(Camera.Projection);
-            drawEffect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(Matrix.Identity)));
-            drawEffect.Parameters["DiffuseColor"].SetValue(new Vector4(1, 1, 0.4f, 1));
-            drawEffect.Parameters["DiffuseLightDirection"].SetValue(Vector3.Normalize(new Vector3(1, 0, -1)));
-            drawEffect.Parameters["FillColor"].SetValue(new Vector4(0.5f, 0.5f, 1, 1));
-            drawEffect.Parameters["FillLightDirection"].SetValue(Vector3.Normalize(new Vector3(0, 1, 1)));
-            drawEffect.Parameters["FogColor"].SetValue(Color.Black.ToVector4());
-            drawEffect.CurrentTechnique = drawEffect.Techniques[0];
-            
-
             var frustum = Camera.GetFrustum();
             var nodes = octTreeModule.Query(frustum).Distinct()
                 .Select(id => renderables.ContainsKey(id) ? renderables[id] : null);
 
+            foreach (var node in nodes)
+            {
+                if (node != null) (node as IRenderable).PreDraw(device, renderContext);
+            }
+
+            device.SetRenderTarget(null);
+            device.Clear(ClearOptions.DepthBuffer, Color.Black, 1.0f, 0);
+            //device.Clear(Color.Black);
+            device.BlendState = BlendState.AlphaBlend;
+            device.DepthStencilState = DepthStencilState.Default;
+            drawEffect.Parameters["World"].SetValue(Matrix.Identity);
+            drawEffect.Parameters["View"].SetValue(Camera.View);
+            drawEffect.Parameters["Projection"].SetValue(Camera.Projection);
+            drawEffect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(Matrix.Identity)));
+            //drawEffect.Parameters["DiffuseColor"].SetValue(new Vector4(1, 1, 1, 1));
+            //drawEffect.Parameters["DiffuseLightDirection"].SetValue(Vector3.Normalize(new Vector3(1, 0, -1)));
+            //drawEffect.Parameters["FillColor"].SetValue(new Vector4(0.5f, 0.5f, 1, 1));
+            //drawEffect.Parameters["FillLightDirection"].SetValue(Vector3.Normalize(new Vector3(0, 1, 1)));
+            drawEffect.Parameters["FogColor"].SetValue(Color.Black.ToVector4());
+            drawEffect.CurrentTechnique = drawEffect.Techniques[0];
             renderContext.BeginScene(drawEffect, device);
+
             foreach (var node in nodes)
             {
                 if (node != null) (node as IRenderable).DrawEx(renderContext);
             }
+
+            debug.Begin(Matrix.Identity, Camera.View, Camera.Projection);
+            foreach (var line in debugLines)
+                debug.Line(line.Item1, line.Item2);
+            debug.Flush();
+            debugLines.Clear();
         }
 
         public UInt32 MousePick(OctTreeModule octTreeModule, Vector2 mouseCoordinates)
         {
+
+            AddDebugLine(new VertexPositionColor(Vector3.Zero, Color.Red),
+                new VertexPositionColor(Camera.Unproject(new Vector3(mouseCoordinates, 0)), Color.Blue));
+
+
             device.SetRenderTarget(mousePickTarget);
             device.Clear(ClearOptions.Target, Vector4.Zero, 0xFFFFFF, 0);
             device.BlendState = BlendState.Opaque;
@@ -103,8 +127,16 @@ namespace Gem.Renderer
             device.SetRenderTarget(null);
             var data = new Color[1];
             mousePickTarget.GetData(data);
-            return data[0].PackedValue;
-           
+            var result = data[0].PackedValue;
+
+            if (renderables.ContainsKey(result))
+            {
+                var mouseRay = new Ray(Camera.GetPosition(), Camera.Unproject(new Vector3(mouseCoordinates, 0)) - Camera.GetPosition());
+                mouseRay.Direction = Vector3.Normalize(mouseRay.Direction);
+                renderables[result].CalculateLocalMouse(mouseRay, AddDebugLine);
+            }
+
+            return result;
         }
 
         void IModule.BeginSimulation(Simulation sim)
@@ -118,7 +150,12 @@ namespace Gem.Renderer
         void IModule.AddComponents(List<Component> components)
         {
             foreach (var component in components)
-                if (component is IRenderable) renderables.Upsert(component.EntityID, component as IRenderable);
+            {
+                if (component is IRenderable)
+                {
+                    renderables.Upsert(component.EntityID, component as IRenderable);
+                }
+            }
         }
 
         void IModule.RemoveEntities(List<UInt32> entities)

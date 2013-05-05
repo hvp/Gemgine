@@ -84,6 +84,9 @@ namespace XNAConsole
                     engine.AddGlobalVariable("xna", c => math );
                     renderer.BindScript(engine);
 
+                    var globals = new MISP.GenericScriptObject();
+                    engine.AddGlobalVariable("@globals", c => globals);
+
                     //var osm = StreetData.MispBinding.GenerateStaticBinding();
                     //engine.AddGlobalVariable("osm", c => osm);
 

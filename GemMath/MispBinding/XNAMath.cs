@@ -28,6 +28,7 @@ namespace Gem.Math
                             AutoBind.NumericArgument(arguments[3]));
                 }));
 
+            xna.SetProperty("helper", AutoBind.GenerateLazyBindingObjectForStaticLibrary(typeof(MathHelper)));
             xna.SetProperty("matrix", AutoBind.GenerateLazyBindingObjectForStaticLibrary(typeof(Matrix)));
             xna.SetProperty("quat", AutoBind.GenerateLazyBindingObjectForStaticLibrary(typeof(Quaternion)));
             xna.SetProperty("v2", AutoBind.GenerateLazyBindingObjectForStaticLibrary(typeof(Vector2), true));

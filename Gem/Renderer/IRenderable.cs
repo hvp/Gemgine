@@ -9,8 +9,8 @@ namespace Gem.Renderer
 {
     public interface IRenderable
     {
-        //Matrix World { get; }
-        //void Draw(GraphicsDevice GraphicsDevice);
+        void PreDraw(GraphicsDevice device, RenderContext context);
         void DrawEx(RenderContext context);
+        void CalculateLocalMouse(Ray mouseRay, Action<VertexPositionColor,VertexPositionColor> debug);
     }
 }

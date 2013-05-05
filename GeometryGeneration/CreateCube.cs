@@ -24,8 +24,8 @@ namespace GeometryGeneration
             result.verticies[7].Position = new Vector3( -0.5f,  0.5f,  0.5f);
 
             result.indicies = new short[] { 
-                0, 1, 2, 
-                3, 0, 2,
+                0, 2, 1, 
+                3, 2, 0,
 
                 0, 1, 4,
                 4, 1, 5,

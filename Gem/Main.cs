@@ -137,7 +137,7 @@ namespace Gem
                     return null;
                 });
 
-            this.Game = new MenuGame();
+            this.Game = new LocalGame();
         }
 
         protected override void UnloadContent()

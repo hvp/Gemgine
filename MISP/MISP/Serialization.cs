@@ -121,7 +121,7 @@ namespace MISP
                 to.Write("^(");
                 foreach (var item in value as ScriptList)
                 {
-                    EmitObjectProperty(to, item, globalFunctions, objects, lambdas, depth + 1);
+                    EmitObjectProperty(to, item, globalFunctions, objects, lambdas, depth + 1, ignoreFunctions);
                     to.Write(" ");
                 }
                 to.Write(")");
@@ -132,6 +132,13 @@ namespace MISP
                 to.Write(value.ToString());
             else if (value is Single)
                 to.Write(value.ToString());
+            else if (value is Boolean)
+            {
+                if ((value as Boolean?).Value == true)
+                    to.Write("true");
+                else
+                    to.Write("null");
+            }
             else if (value is IScriptSerializable)
                 to.Write((value as IScriptSerializable).Serialize());
             else
@@ -290,6 +297,12 @@ namespace MISP
 
         public void SerializeObject(System.IO.TextWriter to, ScriptObject obj)
         {
+            if (obj == null)
+            {
+                to.WriteLine("(null)");
+                return;
+            }
+
             var objects = new List<ObjectRecord>();
 
             EnumerateObject(obj, null, objects, null, true);

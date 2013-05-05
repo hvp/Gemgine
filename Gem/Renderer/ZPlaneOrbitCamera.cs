@@ -41,6 +41,7 @@ namespace Gem.Renderer
 
         public Vector3 Focus = new Vector3(0, 0, 0);
         public Vector3 Position { get { return Focus; } set { Focus = value; } }
+        public Vector3 GetPosition() { return Vector3.Transform(Vector3.Zero, View); }
 
         public float yaw;
         public float pitch;
@@ -85,6 +86,8 @@ namespace Gem.Renderer
             Focus.Z = z_plane;
 
         }
+
+        public void Zoom(float d) { Distance += d; }
 
         public Matrix View
         {

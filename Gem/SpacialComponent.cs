@@ -13,13 +13,22 @@ namespace Gem
 
         private Vector3 _position;
         private Quaternion _orientation;
+        public Vector3 Scale = Vector3.One;
+        public Vector3 EulerOrientation;
+
+        private Matrix CalculateLocalTransformation()
+        {
+            return Matrix.CreateTranslation(_position)
+                * Matrix.CreateFromYawPitchRoll(EulerOrientation.X, EulerOrientation.Y, EulerOrientation.Z)
+                * Matrix.CreateScale(Scale);
+        }
         private BoundingSphere _boundingVolume = new BoundingSphere(Vector3.Zero, 1.0f);
 
         public Matrix Transform
         {
             get
             {
-                return Matrix.CreateFromQuaternion(Orientation) * Matrix.CreateTranslation(Position);
+                return CalculateLocalTransformation();
             }
         }
 

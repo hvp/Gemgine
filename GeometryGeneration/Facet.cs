@@ -13,22 +13,43 @@ namespace GeometryGeneration
         public static Mesh FacetCopy(Mesh m)
         {
             var result = new Mesh();
-            result.verticies = new Vertex[m.indicies.Length];
-            result.indicies = new short[m.indicies.Length];
-
-            for (short i = 0; i < m.indicies.Length; ++i)
+            result.Textured = m.Textured;
+            if (m.Textured)
             {
-                result.verticies[i] = m.verticies[m.indicies[i]];
-                result.indicies[i] = i;
-            }
+                result.texturedVerticies = new TexturedVertex[m.indicies.Length];
+                result.indicies = new short[m.indicies.Length];
 
-            for (short i = 0; i < result.verticies.Length; i += 3)
+                for (short i = 0; i < m.indicies.Length; ++i)
+                {
+                    result.texturedVerticies[i] = m.texturedVerticies[m.indicies[i]];
+                    result.indicies[i] = i;
+                }
+
+                for (short i = 0; i < result.texturedVerticies.Length; i += 3)
+                {
+                    var normal = -Gen.CalculateNormal(result, i, i + 1, i + 2);
+                    for (int j = 0; j < 3; ++j)
+                        result.texturedVerticies[i + j].Normal = normal;
+                }
+            }
+            else
             {
-                var normal = -Gen.CalculateNormal(result, i, i + 1, i + 2);
-                for (int j = 0; j < 3; ++j)
-                    result.verticies[i + j].Normal = normal;
-            }
+                result.verticies = new Vertex[m.indicies.Length];
+                result.indicies = new short[m.indicies.Length];
 
+                for (short i = 0; i < m.indicies.Length; ++i)
+                {
+                    result.verticies[i] = m.verticies[m.indicies[i]];
+                    result.indicies[i] = i;
+                }
+
+                for (short i = 0; i < result.verticies.Length; i += 3)
+                {
+                    var normal = -Gen.CalculateNormal(result, i, i + 1, i + 2);
+                    for (int j = 0; j < 3; ++j)
+                        result.verticies[i + j].Normal = normal;
+                }
+            }
             return result;
         }
     }

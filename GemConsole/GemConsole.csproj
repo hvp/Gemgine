@@ -51,12 +51,6 @@
     <Compile Include="Vertex.cs" />
     <Compile Include="VirtualConsole.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\MISP\MISP\MISP.csproj">
-      <Project>{BA7D4BAE-B4B5-40BC-8E73-6743E260F7BC}</Project>
-      <Name>MISP</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -104,6 +104,7 @@
     <Compile Include="Mesh.cs" />
     <Compile Include="MispBinding.cs" />
     <Compile Include="MorphToSpline.cs" />
+    <Compile Include="Patch.cs" />
     <Compile Include="RawModel.cs" />
     <Compile Include="Subdivide.cs" />
     <Compile Include="Vertex.cs" />

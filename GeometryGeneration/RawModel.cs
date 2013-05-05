@@ -35,7 +35,8 @@ namespace GeometryGeneration
             this.parts.AddRange(parts);
         }
 
-        public int TotalVerticies { get { return parts.Sum((p) => p.verticies.Length); } }
+        public int TotalVerticies { get { return parts.Sum((p) => p.VertexCount); } }
         public int TotalIndicies { get { return parts.Sum((p) => p.indicies.Length); } }
+        public bool IsTextured { get { return parts.FirstOrDefault(p => p.Textured) != null; } }
     }
 }

@@ -10,6 +10,7 @@ namespace Gem.Renderer
     public class FreeCamera : ICamera
     {
         public Vector3 Position { get; set; }
+        public Vector3 GetPosition() { return Position; }
         private Vector3 Forward;
         private Vector3 Up;
         public Viewport Viewport { get; set; }
@@ -52,6 +53,8 @@ namespace Gem.Renderer
             Position += Forward * Y * speed;
             Position += Vector3.Cross(Forward, Up) * X * speed;
         }
+
+        public void Zoom(float d) { }
 
         public Matrix View
         {

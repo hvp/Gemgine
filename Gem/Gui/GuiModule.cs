@@ -14,38 +14,25 @@ namespace Gem
 {
     public class GuiModule : IModule
     {
-        private OrthographicCamera uiCamera = null;
         private RenderContext2D uiRenderer = null;
-        internal Gui.UIItem uiRoot = null;
         private Input Input = null;
-        private MISP.ScriptObject defaultRootSettings = null;
+        public MISP.ScriptObject defaultSettings = null;
         private Simulation sim;
+        private List<GuiSceneNode> activeGuis = new List<GuiSceneNode>();
 
         public GuiModule(GraphicsDevice device, Input input)
         {
-            uiCamera = new OrthographicCamera(device.Viewport);
             uiRenderer = new RenderContext2D(device);
-            uiRoot = new UIItem(device.Viewport.Bounds);
-            uiRoot.defaults = new MISP.GenericScriptObject();
-            
-            uiCamera.focus = new Vector2(device.Viewport.Width / 2, device.Viewport.Height / 2);
 
-            defaultRootSettings = new MISP.GenericScriptObject(
+            defaultSettings = new MISP.GenericScriptObject(
                 "bg-color", new Vector3(0, 0, 0),
-                "hidden-container", true
+                "text-color", new Vector3(1,1,1),
+                "fg-color", new Vector3(1,1,1),
+                "hidden-container", null
                 );
-
-            var loadingLabel = new UIItem(Gui.Layout.CenterItem(new Rectangle(0, 0, 256, 32), uiRoot.rect));
-            loadingLabel.settings = new MISP.GenericScriptObject(
-                "bg-color", new Vector3(0, 1, 0),
-                "label", "Loading...");
-            //uiRoot.AddChild(loadingLabel);
-            uiRoot.settings = defaultRootSettings;
 
             this.Input = input;
         }
-
-        public void ClearUI() { uiRoot.children.Clear(); }
 
         public void ButtonEvent(Object handler, UIItem button)
         {
@@ -54,14 +41,17 @@ namespace Gem
 
         public void HandleInput(Input input)
         {
-            uiRoot.Update(input, this);
+            foreach (var gui in activeGuis)
+            {
+                gui.uiRoot.HandleMouse(gui.MouseHover, gui.LocalMouseX, gui.LocalMouseY, input, this);
+                gui.MouseHover = false;
+            }
         }
 
 #region IModule members
         void IModule.BeginSimulation(Simulation sim)
         {
-            uiRoot.defaults.SetProperty("font", new BitmapFont(sim.Content.Load<Texture2D>("small-font"), 16, 16, 10));
-            uiRoot.defaults.SetProperty("text-color", new Vector3(0, 0, 0));
+            defaultSettings.SetProperty("font", new BitmapFont(sim.Content.Load<Texture2D>("small-font"), 16, 16, 10));
             this.sim = sim;
         }
 
@@ -83,17 +73,26 @@ namespace Gem
 
         void IModule.BindScript(MISP.Engine scriptEngine)
         {
-            scriptEngine.AddGlobalVariable("ui-root", c => uiRoot);
+            //scriptEngine.AddGlobalVariable("ui-root", c => uiRoot);
             var guiBinding = Gem.Gui.MispBinding.GenerateBinding();
             scriptEngine.AddGlobalVariable("ui", c => guiBinding);
+            scriptEngine.AddFunction("create-ui-scene-node", "",
+                (context, arguments) =>
+                {
+                    var r = new GuiSceneNode(MISP.AutoBind.IntArgument(arguments[0]),
+                        MISP.AutoBind.IntArgument(arguments[1]), this);
+                    activeGuis.Add(r);
+                    return r;
+                },
+                    MISP.Arguments.Arg("width"), MISP.Arguments.Arg("height"));
         }
 #endregion
 
-        public void Draw(GraphicsDevice device)
+        public void DrawRoot(UIItem root, OrthographicCamera camera, RenderTarget2D target)
         {
-            uiRenderer.Camera = uiCamera;
-            uiRenderer.BeginScene();
-            uiRoot.Render(uiRenderer);
+            uiRenderer.Camera = camera;
+            uiRenderer.BeginScene(target);
+            root.Render(uiRenderer);
         }
     }
 }

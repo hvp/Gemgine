@@ -82,12 +82,6 @@
       <Processor>ManifestProcessor</Processor>
       <Importer>ManifestImporter</Importer>
     </Compile>
-    <Compile Include="startup.msp">
-      <Name>startup</Name>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Importer>MISPImporter</Importer>
-      <Processor>PassThroughProcessor</Processor>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ContentManifestExtensions\ContentManifestExtensions.csproj">

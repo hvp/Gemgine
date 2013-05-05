@@ -18,8 +18,17 @@ namespace GeometryGeneration
         public static Mesh Copy(Mesh mesh)
         {
             var result = new Mesh();
-            result.verticies = new Vertex[mesh.verticies.Length];
-            for (int i = 0; i < mesh.verticies.Length; ++i) result.verticies[i] = mesh.verticies[i];
+            if (mesh.texturedVerticies != null)
+            {
+                result.texturedVerticies = new TexturedVertex[mesh.texturedVerticies.Length];
+                for (int i = 0; i < mesh.texturedVerticies.Length; ++i) result.texturedVerticies[i] = mesh.texturedVerticies[i];
+            }
+            if (mesh.verticies != null)
+            {
+                result.verticies = new Vertex[mesh.verticies.Length];
+                for (int i = 0; i < mesh.verticies.Length; ++i) result.verticies[i] = mesh.verticies[i];
+            }
+            result.Textured = mesh.Textured;
             result.indicies = new short[mesh.indicies.Length];
             CopyIndicies(result.indicies, 0, mesh.indicies);
             return result;
@@ -71,13 +80,16 @@ namespace GeometryGeneration
 
         public static Vector3 CalculateNormal(Mesh part, int a, int b, int c)
         {
-            return Vector3.Normalize(Vector3.Cross(part.verticies[b].Position - part.verticies[a].Position,
-                     part.verticies[c].Position - part.verticies[a].Position));
+            return Vector3.Normalize(Vector3.Cross(part.GetVertex(b).Position - part.GetVertex(a).Position,
+                     part.GetVertex(c).Position - part.GetVertex(a).Position));
         }
 
         public static void Colorize(Mesh mesh, Vector4 color)
         {
-            for (int i = 0; i < mesh.verticies.Length; ++i) mesh.verticies[i].Color = color;
+            if (mesh.Textured)
+                for (int i = 0; i < mesh.VertexCount; ++i) mesh.texturedVerticies[i].Color = color;
+            else
+                for (int i = 0; i < mesh.VertexCount; ++i) mesh.verticies[i].Color = color;
         }
 
         public static Mesh ColorizeCopy(Mesh mesh, Vector4 color)

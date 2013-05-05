@@ -1,13 +1,22 @@
-(defun make-slider ((arg x)(arg y)(arg w)(arg h)(arg on-change))
+(print "Binding keys.\n")
+(bind-key "W" "HELD" (camera.Pitch (* 1.0 delta)))
+(bind-key "S" "HELD" (camera.Pitch (* -1.0 delta)))
+(bind-key "A" "HELD" (camera.Yaw (* 1.0 delta)))
+(bind-key "D" "HELD" (camera.Yaw (* -1.0 delta)))
+(bind-key "R" "HELD" (camera.Zoom (* 10.0 delta)))
+(bind-key "F" "HELD" (camera.Zoom (* -10.0 delta)))
+
+(defun make-slider ((arg x)(arg y)(arg w)(arg h)(arg min)(arg max)(arg on-change))
 	(ui.create "slider"
 		(xna.rect.@construct x y w h)
 		(record
 			(bg-color (xna.v 0 0 0))
 			(fg-color (xna.v 1 0 0))
 			(step 1)
-			(minimum 0)
-			(maximum 100)
+			(minimum min)
+			(maximum max)
 			(handle-size 8)
+			(transparent true)
 			(on-change on-change)
 		)
 	)
@@ -26,19 +35,90 @@
 	)
 )
 
-(add-part 0 (mesh.facet-copy (mesh.colorize-copy (mesh.create-cube) (xna.v 1 1 1 1))))
+(add-part 1 (mesh.facet-copy (mesh.colorize-copy (mesh.create-cube) (xna.v 1 1 1 1))))
 
+(let 
+	((ui-scene-node (create-ui-scene-node 256 256))
+	(scene-component (renderer.create-scene-component ui-scene-node))
+	(spacial (c-spacial (xna.v 0 0 0))))
+	(nop
+		(create-entity 0
+			spacial
+			scene-component
+		)
 
-(ui-root.AddChild 
-	(make-slider 32 32 16 128
-		(lambda "" ((arg slider)) 
-			(set data.active-part.rootNode localTransformation 
-				(xna.matrix.create-scale 
-					(+ 1 (/ (slider.get_position) 25.0))
+		(set ui-scene-node.uiRoot settings (record (transparent true)))
+		
+		(ui-scene-node.uiRoot.AddChild 
+			(ui.create "item" (xna.rect.@construct 32 32 96 16)
+				(record
+					(bg-color (xna.v 0.3 0.3 0.3))
+					(text-color (xna.v 1 1 1))
+					(label "new cube")
+					(on-click null)
 				)
+				(record
+					(text-color (xna.v 1 0 0))
+				)
+			)
+		)
+
+		(ui-scene-node.uiRoot.AddChild 
+			(make-slider 32 (+ 32 64 16) 16 128 0 100
+				(lambda "" ((arg slider)) 
+					(let (
+						(pos (+ 1 (/ (slider.get_position) 25.0)))
+						)
+						(set data.active-part.rootNode Scale (xna.v pos pos pos))
+					)
+				)
+			)
+		)
+
+		(ui-scene-node.uiRoot.AddChild 
+			(make-slider (+ 32 48) (+ 32 64 16) 16 128 0 360
+				(lambda "" ((arg slider)) 
+					(let (
+						(node data.active-part.rootNode)
+						(rot node.EulerOrientation)
+						)
+						(set node EulerOrientation (xna.v (xna.helper.to-radians (slider.get_position)) rot.Y rot.Z))
+					)
+				)
+			)
+		)
+
+(ui-scene-node.uiRoot.AddChild 
+	(make-slider (+ 48 32 48) (+ 32 64 16) 16 128 0 360
+		(lambda "" ((arg slider)) 
+			(let (
+				(node data.active-part.rootNode)
+				(rot node.EulerOrientation)
+				)
+				(set node EulerOrientation (xna.v rot.X (xna.helper.to-radians (slider.get_position)) rot.Z))
 			)
 		)
 	)
 )
+
+(ui-scene-node.uiRoot.AddChild 
+	(make-slider (+ 48 48 32 48) (+ 32 64 16) 16 128 0 360
+		(lambda "" ((arg slider)) 
+			(let (
+				(node data.active-part.rootNode)
+				(rot node.EulerOrientation)
+				)
+				(set node EulerOrientation (xna.v rot.X rot.Y (xna.helper.to-radians (slider.get_position))))
+			)
+		)
+	)
+)
+
+(set spacial EulerOrientation (xna.v (xna.helper.to-radians 180) (xna.helper.to-radians 90) 0))
+(set spacial Scale (xna.v 5 5 5))
+
+
+
+))
 
 ))

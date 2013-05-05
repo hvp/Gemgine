@@ -23,6 +23,11 @@ namespace MISP
             return Convert.ToInt32(obj);
         }
 
+        public static char CharArgument(Object obj)
+        {
+            return Convert.ToChar(obj);
+        }
+
         public static uint UIntArgument(Object obj)
         {
             return Convert.ToUInt32(obj);

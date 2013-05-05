@@ -21,6 +21,11 @@ namespace MISP
                     {
                         context.Scope.ChangeVariable(vName, item);
                         result.Add(Evaluate(context, code, true));
+                        if (context.evaluationState == EvaluationState.UnwindingBreak)
+                        {
+                            context.Scope.PopVariable(vName);
+                            return context.UnBreak();
+                        }
                     }
                     context.Scope.PopVariable(vName);
                     return result;
@@ -42,6 +47,11 @@ namespace MISP
                     {
                         context.Scope.ChangeVariable(vName, i);
                         result.Add(Evaluate(context, code, true));
+                        if (context.evaluationState == EvaluationState.UnwindingBreak)
+                        {
+                            context.Scope.PopVariable(vName);
+                            return context.UnBreak();
+                        }
                     }
                     context.Scope.PopVariable(vName);
                     return result;
@@ -67,6 +77,11 @@ namespace MISP
                     {
                         context.Scope.ChangeVariable(vName, item);
                         result.Add(Evaluate(context, code, true));
+                        if (context.evaluationState == EvaluationState.UnwindingBreak)
+                        {
+                            context.Scope.PopVariable(vName);
+                            return context.UnBreak();
+                        }
                         item = Evaluate(context, next, true);
                     }
 
@@ -91,6 +106,11 @@ namespace MISP
                     {
                         context.Scope.ChangeVariable(vName, item);
                         result = Evaluate(context, func, true);
+                        if (context.evaluationState == EvaluationState.UnwindingBreak)
+                        {
+                            context.Scope.PopVariable(vName);
+                            return context.UnBreak();
+                        }
                     }
 
                     context.Scope.PopVariable(vName);
@@ -115,6 +135,11 @@ namespace MISP
                     {
                         context.Scope.ChangeVariable(vName, i);
                         result = Evaluate(context, func, true);
+                        if (context.evaluationState == EvaluationState.UnwindingBreak)
+                        {
+                            context.Scope.PopVariable(vName);
+                            return context.UnBreak();
+                        }
                     }
 
                     context.Scope.PopVariable(vName);
@@ -135,6 +160,7 @@ namespace MISP
 
                     while (context.evaluationState == EvaluationState.Normal && Evaluate(context, cond, true) != null)
                         if (context.evaluationState == EvaluationState.Normal) Evaluate(context, code, true);
+                    if (context.evaluationState == EvaluationState.UnwindingBreak) return context.UnBreak();
                     return null;
                 },
                 Arguments.Lazy("condition"),
